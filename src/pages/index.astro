@@ -1,6 +1,7 @@
 ---
 import { getCollection, render } from 'astro:content';
 import "../styles/global.css";
+import Footer from '../components/Footer.astro';
 
 const reports = await getCollection('reports');
 
@@ -126,11 +127,7 @@ if (latest) {
     </main>
 
 
-    <footer>
-      <div class="container">
-        Generated automatically by n8n + Gemini.
-      </div>
-    </footer>
+    <Footer />
 
   </body>
 </html>

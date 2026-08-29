@@ -1,6 +1,7 @@
 ---
 import { getCollection } from 'astro:content';
 import "../styles/global.css";
+import Footer from '../components/Footer.astro';
 
 const reports = await getCollection('reports');
 
@@ -53,7 +54,11 @@ reports.sort((a, b) => getReportTime(b) - getReportTime(a));
 
     </div>
 
-    <a class="archive-link" href="/">
+    <!-- FIXED -->
+    <a
+      class="archive-link"
+      href={import.meta.env.BASE_URL}
+    >
       Latest
     </a>
 
@@ -89,7 +94,7 @@ reports.sort((a, b) => getReportTime(b) - getReportTime(a));
       return (
         <a
           class="archive-item"
-          href={`${import.meta.env.BASE_URL}/reports/${slug}`}
+          href={`${import.meta.env.BASE_URL}reports/${slug}`}
         >
 
           <strong>
@@ -110,11 +115,6 @@ reports.sort((a, b) => getReportTime(b) - getReportTime(a));
 </main>
 
 
-<footer>
-  <div class="container">
-    AI Research Daily
-  </div>
-</footer>
-
+<Footer />
 </body>
 </html>

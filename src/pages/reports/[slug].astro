@@ -1,6 +1,7 @@
 ---
 import { getCollection, render } from 'astro:content';
 import "../../styles/global.css";
+import Footer from '../../components/Footer.astro';
 
 export async function getStaticPaths() {
 
@@ -108,13 +109,7 @@ const { Content } = await render(report);
 </main>
 
 
-<footer>
-
-  <div class="container">
-    Generated automatically by n8n + Gemini.
-  </div>
-
-</footer>
+<Footer />
 
 </body>
 
