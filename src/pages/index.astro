@@ -103,7 +103,7 @@ if (latest) {
       return (
         <a
           class="archive-item"
-          href={`/reports/${slug}`}
+          href={`${import.meta.env.BASE_URL}reports/${slug}`}
         >
           <strong>{report.data.date}</strong>
 
@@ -116,7 +116,7 @@ if (latest) {
   }
 
   <div style="margin-top: 24px;">
-    <a class="archive-link" href="/archive">
+    <a class="archive-link" href={`${import.meta.env.BASE_URL}archive`}>
       View full archive →
     </a>
   </div>
