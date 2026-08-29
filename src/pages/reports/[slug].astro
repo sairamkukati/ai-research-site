@@ -1,0 +1,121 @@
+---
+import { getCollection, render } from 'astro:content';
+import "../../styles/global.css";
+
+export async function getStaticPaths() {
+
+  const reports = await getCollection('reports');
+
+  return reports.map((report) => ({
+
+    params: {
+      slug: report.id.replace(/\.md$/, '')
+    },
+
+    props: {
+      report
+    }
+
+  }));
+}
+
+const { report } = Astro.props;
+
+const { Content } = await render(report);
+---
+
+<html lang="en">
+
+<head>
+
+  <meta charset="UTF-8" />
+
+  <meta
+    name="viewport"
+    content="width=device-width"
+  />
+
+  <title>
+    AI Research Daily — {report.data.date}
+  </title>
+
+</head>
+
+
+<body>
+
+<header class="site-header">
+
+  <div class="container header-inner">
+
+    <div class="brand">
+
+      <div class="brand-icon">
+        🤖
+      </div>
+
+      <div>
+
+        <div class="logo">
+          AI Research Daily
+        </div>
+
+        <div class="tagline">
+          AI research · technology · startup intelligence
+        </div>
+
+      </div>
+
+    </div>
+
+    <a
+      class="archive-link"
+      href="/archive"
+    >
+      Archive
+    </a>
+
+  </div>
+
+</header>
+
+
+<main class="container">
+
+  <section class="hero">
+
+    <div class="date">
+      {report.data.date}
+    </div>
+
+    <h1>
+      AI Research Daily
+    </h1>
+
+    <p class="tagline">
+      Daily AI developments, trends and ideas.
+    </p>
+
+  </section>
+
+
+  <article>
+
+    <Content />
+
+  </article>
+
+</main>
+
+
+<footer>
+
+  <div class="container">
+    Generated automatically by n8n + Gemini.
+  </div>
+
+</footer>
+
+</body>
+
+</html>

@@ -1,0 +1,120 @@
+---
+import { getCollection } from 'astro:content';
+import "../styles/global.css";
+
+const reports = await getCollection('reports');
+
+function getReportTime(report) {
+  const id = report.id.replace(/\.md$/, '');
+
+  const match = id.match(
+    /(\d{4}-\d{2}-\d{2})(?:-(\d{2})-(\d{2})-(\d{2}))?$/
+  );
+
+  if (!match) return 0;
+
+  const [, date, hour = "00", minute = "00", second = "00"] = match;
+
+  return new Date(
+    `${date}T${hour}:${minute}:${second}`
+  ).getTime();
+}
+
+reports.sort((a, b) => getReportTime(b) - getReportTime(a));
+---
+
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width" />
+  <title>Research Archive</title>
+</head>
+
+<body>
+
+<header class="site-header">
+  <div class="container header-inner">
+
+    <div class="brand">
+
+      <div class="brand-icon">
+        🤖
+      </div>
+
+      <div>
+        <div class="logo">
+          AI Research Daily
+        </div>
+
+        <div class="tagline">
+          AI research · technology · startup intelligence
+        </div>
+      </div>
+
+    </div>
+
+    <a class="archive-link" href="/">
+      Latest
+    </a>
+
+  </div>
+</header>
+
+
+<main class="container">
+
+  <section class="hero">
+
+    <div class="date">
+      RESEARCH LIBRARY
+    </div>
+
+    <h1>
+      Archive
+    </h1>
+
+    <p class="tagline">
+      Daily AI intelligence reports.
+    </p>
+
+  </section>
+
+
+  <section class="archive">
+
+    {reports.map((report) => {
+
+      const slug = report.id.replace(/\.md$/, '');
+
+      return (
+        <a
+          class="archive-item"
+          href={`/reports/${slug}`}
+        >
+
+          <strong>
+            {report.data.date}
+          </strong>
+
+          <span>
+            → Read report
+          </span>
+
+        </a>
+      );
+
+    })}
+
+  </section>
+
+</main>
+
+
+<footer>
+  <div class="container">
+    AI Research Daily
+  </div>
+</footer>
+
+</body>
+</html>
