@@ -5,129 +5,245 @@ import Footer from '../components/Footer.astro';
 
 const reports = await getCollection('reports');
 
+
+// ============================================
+// GET REPORT TIMESTAMP FROM FILENAME
+// Supports:
+// ai-research-2026-08-31.md
+// ai-research-2026-08-31-22-38-27.md
+// ============================================
+
 function getReportTime(report) {
   const id = report.id.replace(/\.md$/, '');
 
-  // YYYY-MM-DD-HH-mm-ss
-  const timestampMatch = id.match(
+  const match = id.match(
     /(\d{4}-\d{2}-\d{2})(?:-(\d{2})-(\d{2})-(\d{2}))?$/
   );
 
-  if (!timestampMatch) {
+  if (!match) {
     return 0;
   }
 
-  const [, date, hour = "00", minute = "00", second = "00"] =
-    timestampMatch;
+  const [, date, hour = "00", minute = "00", second = "00"] = match;
 
   return new Date(
     `${date}T${hour}:${minute}:${second}`
   ).getTime();
 }
 
+
+// ============================================
+// EXTRACT DATE ONLY FROM FILENAME
+// ============================================
+
+function getReportDate(report) {
+  const id = report.id.replace(/\.md$/, '');
+
+  const match = id.match(/(\d{4}-\d{2}-\d{2})/);
+
+  // Fallback to frontmatter date if filename
+  // doesn't contain a valid date.
+  return match?.[1] || report.data.date || "";
+}
+
+
+// ============================================
+// SORT NEWEST → OLDEST
+// ============================================
+
 reports.sort((a, b) => {
   return getReportTime(b) - getReportTime(a);
 });
 
+
 const latest = reports[0];
+
+
+// ============================================
+// RENDER LATEST REPORT
+// ============================================
 
 let Content;
 
 if (latest) {
   ({ Content } = await render(latest));
 }
+
+
+// ============================================
+// LATEST REPORT DATE
+// Comes from filename, NOT Gemini.
+// ============================================
+
+const latestDate = latest
+  ? getReportDate(latest)
+  : "";
+
 ---
 
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width" />
-    <title>AI Research Daily</title>
-  </head>
 
-  <body>
+<head>
+  <meta charset="UTF-8" />
 
-    <header class="site-header">
-      <div class="container header-inner">
+  <meta
+    name="viewport"
+    content="width=device-width"
+  />
 
-        <div>
-          <div class="logo">🤖 AI Research Daily</div>
-          <div class="tagline">
-            AI research • technology • startup intelligence
-          </div>
-        </div>
+  <title>AI Research Daily</title>
+</head>
 
-        <a class="archive-link" href="#archive">
-          Archive
-        </a>
 
+<body>
+
+
+<header class="site-header">
+
+  <div class="container header-inner">
+
+    <div>
+
+      <div class="logo">
+        🤖 AI Research Daily
       </div>
-    </header>
+
+      <div class="tagline">
+        AI research • technology • startup intelligence
+      </div>
+
+    </div>
 
 
-    <main class="container">
-
-      {latest && (
-        <>
-          <section class="hero">
-
-            <div class="date">
-              {latest.data.date}
-            </div>
-
-            <h1>
-              AI Research Daily
-            </h1>
-
-            <p class="tagline">
-              Today's AI developments, trends and ideas.
-            </p>
-
-          </section>
-
-
-          <article>
-            <Content />
-          </article>
-        </>
-      )}
-
-
-      <section id="archive" class="archive">
-
-  <h2>📚 Previous Reports</h2>
-
-  {
-    reports.slice(1, 4).map((report) => {
-      const slug = report.id.replace(/\.md$/, '');
-
-      return (
-        <a
-          class="archive-item"
-          href={`${import.meta.env.BASE_URL}reports/${slug}`}
-        >
-          <strong>{report.data.date}</strong>
-
-          <span>
-            → Read report
-          </span>
-        </a>
-      );
-    })
-  }
-
-  <div style="margin-top: 24px;">
-    <a class="archive-link" href={`${import.meta.env.BASE_URL}archive`}>
-      View full archive →
+    <a
+      class="archive-link"
+      href="#archive"
+    >
+      Archive
     </a>
+
   </div>
 
-</section>
-
-    </main>
+</header>
 
 
-    <Footer />
 
-  </body>
+<main class="container">
+
+
+  {latest && (
+
+    <>
+
+      <!-- ================================
+           LATEST REPORT
+      ================================= -->
+
+      <section class="hero">
+
+        <div class="date">
+          {latestDate}
+        </div>
+
+
+        <h1>
+          AI Research Daily
+        </h1>
+
+
+        <p class="tagline">
+          Today's AI developments, trends and ideas.
+        </p>
+
+      </section>
+
+
+
+      <article>
+
+        <Content />
+
+      </article>
+
+    </>
+
+  )}
+
+
+
+  <!-- ================================
+       PREVIOUS REPORTS
+  ================================= -->
+
+  <section
+    id="archive"
+    class="archive"
+  >
+
+    <h2>
+      📚 Previous Reports
+    </h2>
+
+
+    {
+      reports
+        .slice(1, 4)
+        .map((report) => {
+
+          const slug =
+            report.id.replace(/\.md$/, '');
+
+          const reportDate =
+            getReportDate(report);
+
+          return (
+
+            <a
+              class="archive-item"
+              href={`${import.meta.env.BASE_URL}reports/${slug}`}
+            >
+
+              <strong>
+                {reportDate}
+              </strong>
+
+
+              <span>
+                → Read report
+              </span>
+
+            </a>
+
+          );
+
+        })
+    }
+
+
+
+    <div
+      style="margin-top: 24px;"
+    >
+
+      <a
+        class="archive-link"
+        href={`${import.meta.env.BASE_URL}archive`}
+      >
+        View full archive →
+      </a>
+
+    </div>
+
+  </section>
+
+
+</main>
+
+
+
+<Footer />
+
+
+</body>
+
 </html>
